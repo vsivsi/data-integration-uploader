@@ -1,5 +1,4 @@
 $('.upload-btn').on('click', function () {
-    console.log('clicked upload-btn');
     $('#parse-status').text('');
     setPanelStatus($("#status-panel"), 'panel-primary');
     $('#upload-input').click();
@@ -18,10 +17,7 @@ function setPanelStatus($el, newClass) {
   $el.addClass(newClass);
 }
 
-const error_re = /^TimeSeriesCopError:\s*(.*)/;
-
 $('#upload-input').on('change', function() {
-  console.log('upload-input changed');
   var files = $(this).get(0).files;
 
   if (files.length > 0){
@@ -44,19 +40,15 @@ $('#upload-input').on('change', function() {
       processData: false,
       contentType: false,
       success: function(data){
-        console.log('upload successful!\n' + data);
+        console.log('uploaded!\n' + data);
         // Print result
         $("#parsing-loader").hide();
-        const errorMatch = error_re.exec($.trim(data));
-        if ($.trim(data).match(/^Success\./)) {
+        if ($.trim(data).match(/^Success/)) {
           setPanelStatus($("#status-panel"), 'panel-success');
-          $("#parse-status").text('File validation passed');
-        } else if (errorMatch) {
-          setPanelStatus($("#status-panel"), 'panel-danger');
-          $("#parse-status").text(errorMatch[1]);
+          $("#parse-status").text('File upload and validation successful');
         } else {
           setPanelStatus($("#status-panel"), 'panel-danger');
-          $("#parse-status").text('Unknown Error');
+          $("#parse-status").text(data);
         }
 
         // Clear form so 'change' with same file trigger new upload
