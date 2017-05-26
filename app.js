@@ -11,6 +11,8 @@ const argv = require('yargs')
     .describe('p', 'port')
     .alias('p', 'port')
     .default('p', '8080')
+    .describe('s', 'Script to run after successful validation. Will be passed two arguments: file path and file type')
+    .alias('s', 'script')
     .help('h')
     .alias('h', 'help')
     .argv;
@@ -42,6 +44,8 @@ app.get('/upload', function(req, res) {
   res.sendFile(path.join(__dirname, 'views/upload.html'));
 });
 
+const filetype_re = /^Success. (\S+)\..+/;
+
 app.post('/upload',
   upload.single('datafile'),
   function(req, res) {
@@ -54,9 +58,29 @@ app.post('/upload',
         '-o', path.join(uploadDir, 'parsed', req.file.filename)
       ],
       (err, stdout, stderr) => {
-        if (err) console.log(err);
         console.log('stdout: ' + stdout);
         console.log('stderr: ' + stderr);
+        if (err) {
+          console.log(err);
+        } else {
+          const match = filetype_re.exec(stdout);
+          if (match) {
+            const filetype = match[1];
+            console.log(`matched ${filetype}`);
+            if (argv.script) {
+              console.log('Attempting to run script');
+              child.execFile(argv.script, [ req.file.path, filetype ], (err, stdout, stderr) => {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log('restic backup successful');
+                }
+              });
+            }
+          }
+        }
         res.end(stdout);
       }
     );
@@ -65,4 +89,7 @@ app.post('/upload',
 
 const server = app.listen(argv.port, function(){
   console.log('Server listening on port ' + argv.port);
+  if (argv.script) {
+    console.log('Success script: ' + argv.script);
+  }
 });
