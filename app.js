@@ -109,55 +109,58 @@ app.post('/upload',
             // CONSUL CHILD PROCESS
             // ********************
             // Send header prop as input to consul script
-            const consulChild = child.execFile(argv.consul, [], (err, stdout, stderr) => {
-              console.log('stdout: ' + stdout);
-              console.log('stderr: ' + stderr);
-              if (err) {
-                console.log(err);
-                res.end('Unknown Error');
-                return;
+            const consulChild = child.execFile(argv.consul,
+              [ parseResult.header.measurement ],
+              (err, stdout, stderr) => {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (err) {
+                  console.log(err);
+                  res.end('Unknown Error');
+                  return;
+                }
+                let consulResult;
+                try {
+                  consulResult = JSON.parse(stdout);
+                } catch (e) { } // something bad happened
+                if (! consulResult) {
+                  console.log('Could not parse consul script output');
+                  res.end('Unknown Error');
+                  return;
+                }
+                // Check header JSON returned from consul against header we parsed
+                // in original file. Column types and column headers should match.
+                if (compareHeaders(parseResult.header, consulResult)) {
+                  // Validation passed, now backup
+                  console.log('Consul validated, backing up file');
+                  // ********************
+                  // BACKUP CHILD PROCESS
+                  // ********************
+                  child.execFile(argv.backup, [ path.resolve(req.file.path), parseResult.header.measurement ], (err, stdout, stderr) => {
+                    console.log('stdout: ' + stdout);
+                    console.log('stderr: ' + stderr);
+                    if (err) {
+                      console.log(err);
+                      res.end('Unknown Error');
+                      return;
+                    } else {
+                      console.log('restic backup successful');
+                      res.end('Success');
+                      return;
+                    }
+                  });  // END BACKUP
+                } else {
+                  // Validation failed at consul step
+                  let errormsg = `Validation failed, ${parseResult.header.measurement} headers and/or types have changed\n`;
+                  errormsg += `upload types: ${JSON.stringify(parseResult.header.types)}\n`;
+                  errormsg += `system types: ${JSON.stringify(consulResult.types)}\n`;
+                  errormsg += `upload headers: ${JSON.stringify(parseResult.header.headers)}\n`;
+                  errormsg += `system headers: ${JSON.stringify(consulResult.headers)}\n`;
+                  res.end(errormsg);
+                  return;
+                }
               }
-              let consulResult;
-              try {
-                consulResult = JSON.parse(stdout);
-              } catch (e) { } // something bad happened
-              if (! consulResult) {
-                console.log('Could not parse consul script output');
-                res.end('Unknown Error');
-                return;
-              }
-              // Check header JSON returned from consul against header we parsed
-              // in original file. Column types and column headers should match.
-              if (compareHeaders(parseResult.header, consulResult)) {
-                // Validation passed, now backup
-                console.log('Consul validated, backing up file');
-                // ********************
-                // BACKUP CHILD PROCESS
-                // ********************
-                child.execFile(argv.backup, [ path.resolve(req.file.path), parseResult.header.measurement ], (err, stdout, stderr) => {
-                  console.log('stdout: ' + stdout);
-                  console.log('stderr: ' + stderr);
-                  if (err) {
-                    console.log(err);
-                    res.end('Unknown Error');
-                    return;
-                  } else {
-                    console.log('restic backup successful');
-                    res.end('Success');
-                    return;
-                  }
-                });  // END BACKUP
-              } else {
-                // Validation failed at consul step
-                let errormsg = `Validation failed, ${parseResult.header.measurement} headers and/or types have changed\n`;
-                errormsg += `upload types: ${JSON.stringify(parseResult.header.types)}\n`;
-                errormsg += `system types: ${JSON.stringify(consulResult.types)}\n`;
-                errormsg += `upload headers: ${JSON.stringify(parseResult.header.headers)}\n`;
-                errormsg += `system headers: ${JSON.stringify(consulResult.headers)}\n`;
-                res.end(errormsg);
-                return;
-              }
-            });  // END CONSUL
+            );  // END CONSUL
             // send header to consul on stdin, which should listen for data event
             consulChild.stdin.write(JSON.stringify(parseResult.header));
             consulChild.stdin.end();
