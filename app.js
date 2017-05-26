@@ -57,7 +57,7 @@ app.post('/upload',
     child.execFile(
       'node',
       [
-        'node_modules/.bin/lineprotocol-standard-format',
+        '/usr/local/bin/lineprotocol-standard-format',
         '-i', req.file.path,
         '-o', path.join(uploadDir, 'parsed', req.file.filename)
       ],

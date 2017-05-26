@@ -13,7 +13,6 @@
     "express": "^4.15.2",
     "morgan": "^1.8.1",
     "multer": "^1.3.0",
-    "time-series-cop": "ctberthiaume/time-series-cop#2.1.0",
     "yargs": "^8.0.1"
   }
 }
