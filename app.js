@@ -109,7 +109,7 @@ app.post('/upload',
             // CONSUL CHILD PROCESS
             // ********************
             // Send header prop as input to consul script
-            const consulChild = child.execFile(argv.consul, [], (err, stdout, stderr) => {
+            const consulChild = child.execFile(argv.consul, [ parseResult.header.measurement ], (err, stdout, stderr) => {
               console.log('stdout: ' + stdout);
               console.log('stderr: ' + stderr);
               if (err) {
