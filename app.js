@@ -55,7 +55,7 @@ app.post('/upload',
   function(req, res) {
     console.log(`received ${req.file.originalname} as ${req.file.path}, size=${req.file.size}`);
     child.execFile(
-      'node',
+      '/usr/local/bin/node',
       [
         'node_modules/.bin/lineprotocol-standard-format',
         '-i', req.file.path,
