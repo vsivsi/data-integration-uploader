@@ -17,6 +17,10 @@ const argv = require('yargs')
     .alias('h', 'help')
     .argv;
 
+if (argv.script) {
+  argv.script = path.resolve(argv.script);
+}
+
 // Make sure upload folders exist
 const uploadDir = './uploads';
 if (!fs.existsSync(uploadDir)) {
@@ -69,7 +73,7 @@ app.post('/upload',
             console.log(`matched ${filetype}`);
             if (argv.script) {
               console.log('Attempting to run script');
-              child.execFile(argv.script, [ req.file.path, filetype ], (err, stdout, stderr) => {
+              child.execFile(argv.script, [ path.resolve(req.file.path), filetype ], (err, stdout, stderr) => {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
                 if (err) {
