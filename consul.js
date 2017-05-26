@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+const argv = require('yargs').argv;
+
+console.error(`consul script called with arguments: ${argv._}`);
 
 const stdin = process.stdin,
     stdout = process.stdout;
