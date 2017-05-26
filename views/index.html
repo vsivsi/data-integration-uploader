@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Data Integration Standard File Uploader</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+	<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		    </div>
+		    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+		        <li class="active"><a href="/">Home<span class="sr-only">(current)</span></a></li>
+		        <li><a href="/upload">Upload File</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">File Format Description</h3>
+					</div>
+					<div id="format" class="panel-body">
+						<h2 id="toc_0">Introduction</h2>
+
+						<p>This document describes a simple text file format to enable easy integration and sharing of the wide variety of time series data sets produced during and after a reseach cruise. The format has been designed to be simple, while capturing both the data and other essential information required for both human and computer interpretation of the data. It can be easily output from spreadsheet software or generated automatically by a script written in any computer language (e.g. R, Python, Matlab) In addition to being easy to create, such files are also simple to automatically validate, catching many types of errors and encouraging submission of essential information such as human readable descriptions, data types, and units.</p>
+
+						<p>This file format is basically a standard tab-delimited time series data file, but with additional metadata included at the top of the file. For example, let&#39;s say we start with this minimal data file:</p>
+
+						<table class='table table-bordered'>
+						<thead>
+						<tr>
+						<th>time</th>
+						<th>Station</th>
+						<th>Depth</th>
+						<th>po4</th>
+						<th>no3</th>
+						</tr>
+						</thead>
+
+						<tbody>
+						<tr>
+						<td>2017-05-06T19:52:57.601Z</td>
+						<td>1</td>
+						<td>10</td>
+						<td>0.2</td>
+						<td>3.2</td>
+						</tr>
+						<tr>
+						<td>2017-05-06T20:52:57.601Z</td>
+						<td>2</td>
+						<td>10</td>
+						<td>0.4</td>
+						<td>2.1</td>
+						</tr>
+						<tr>
+						<td>2017-05-06T21:52:57.601Z</td>
+						<td>3</td>
+						<td>10</td>
+						<td>0.8</td>
+						<td>4</td>
+						</tr>
+						</tbody>
+						</table>
+
+						<p>While this file meets our goal of being machine readable, there isn&#39;t enough information to properly interpret the data. Many additional questions need to be addressed first, e.g. which cruise is this data from, what depth is <code>Depth</code> describing, how were phosphate and nitrate collected, what are the units for <code>Depth</code>, <code>po4</code>, and <code>no3</code>, is <code>Station</code> a measurement value or a station name?</p>
+
+						<p>By adding six additional header lines to the top of this file we can address all of these questions.</p>
+
+						<h2 id="toc_1">Example</h2>
+
+						<p>Here is an example of a valid data file with these six additional header lines</p>
+
+						<table class='table table-bordered'>
+						<tbody>
+						<tr>
+						<td colspan=5>NiskinMacroNutrients</td>
+						</tr>
+						<tr>
+						<td colspan=5>MGL17-04</td>
+						</tr>
+						<tr>
+						<td colspan=5>Concentration of macronutrients collected from niskins on station.</td>
+						</tr>
+						<tr>
+						<td>NA</td>
+						<td>Station number</td>
+						<td>Depth of sampling in meters</td>
+						<td>PO4 concentration, based on XY technique, in micromole per liter</td>
+						</tr>
+						<tr>
+						<td>time</td>
+						<td>category</td>
+						<td>float</td>
+						<td>float</td>
+						</tr>
+						<tr>
+						<td>NA</td>
+						<td>NA</td>
+						<td>m</td>
+						<td>uM</td>
+						</tr>
+						<tr>
+						<td>time</td>
+						<td>Station</td>
+						<td>Depth</td>
+						<td>po4</td>
+						</tr>
+						<tr>
+						<td>2017-05-06T19:52:57.601Z</td>
+						<td>1</td>
+						<td>10</td>
+						<td>0.2</td>
+						</tr>
+						<tr>
+						<td>2017-05-06T20:52:57.601Z</td>
+						<td>2</td>
+						<td>10</td>
+						<td>0.4</td>
+						</tr>
+						<tr>
+						<td>2017-05-06T21:52:57.601Z</td>
+						<td>3</td>
+						<td>10</td>
+						<td>0.8</td>
+						</tr>
+						</tbody>
+						</table>
+
+						<p>
+							<a href="/example.txt" download>example.txt</a>
+						</p>
+						<p>
+							<a href="/example.xlsx" download>example.xlsx</a>
+						</p>
+
+
+						<p>This is a text file with tab-delimited columns (a TSV file) with seven lines of required headers at the top, followed by any number of lines of tab-separated data value columns. The first three header lines contain one column of data each. All remaining header and data lines in the file must contain the exact same number of tab separated columns. Columns that intentionally contain no information must be filled with the special value <code>NA</code>.</p>
+
+						<h2 id="toc_2">Header lines</h2>
+
+						<h4 id="toc_3">Line 1) <code>&lt;file type&gt;</code></h4>
+
+						<p>An identifier that will be used to define this kind of file, i.e. # columns,  column headers, column types. It should be relatively short and can only contain letters, numbers, <code>_</code>, and <code>-</code>. All files using this identifier must have a consistent set of column definitions. This will be the label used to find the file in the system UI. Any text after the first tab character will be ignored.</p>
+
+						<h4 id="toc_4">Line 2) <code>&lt;cruise&gt;</code></h4>
+
+						<p>A common identifier for the cruise (expedition) or lab-based project from which this data was produced. This should exactly match the official name of the cruise. Any text after the first tab character will be ignored.</p>
+
+						<h4 id="toc_5">Line 3) <code>&lt;file description&gt;</code></h4>
+
+						<p>Description of this data file. This should provide a summary of the data collected in this file and any metadata not present in other header lines, e.g. the person(s) responsible for producing and maintaining this data file. Any text after the first tab character will be ignored.</p>
+
+						<h4 id="toc_6">Line 4) <code>&lt;column descriptions&gt;</code></h4>
+
+						<p>A tab-delimited line with descriptions about each column. For example, if a column is called <code>temp1</code> this is where you could provide additional details such as <code>water temperature at stern intake</code>. Any columns without a description should be filled with the special value <code>NA</code>.</p>
+
+						<h4 id="toc_7">Line 5) <code>&lt;column types&gt;</code></h4>
+
+						<p>A tab-delimited line with data types for each column. Allowed types are <code>time</code>, <code>float</code>, <code>integer</code>, <code>text</code>, <code>category</code>, and <code>boolean</code>. <code>time</code> should always be the first column. <code>category</code> is a special kind of text identifier value that can be used to group or filter data. For example, this may be the population name for organism abundance measurements, or in our example&#39;s case the station identifier. <code>boolean</code> values must
+						be either <code>TRUE</code> or <code>FALSE</code>. All columns must be filled in (<code>NA</code> is not allowed).</p>
+
+						<h4 id="toc_8">Line 6) <code>&lt;column units&gt;</code></h4>
+
+						<p>A tab-delimited line with units for each numeric column, e.g. <code>float</code> and <code>integer</code>. Unit identifiers are not defined or validated, but should follow accepted standards and practices for this type of data. Any columns with no unit information should be filled with <code>NA</code>. The units for the first <code>time</code> column may be <code>NA</code>.</p>
+
+						<h4 id="toc_9">Line 7) <code>&lt;column headers&gt;</code></h4>
+
+						<p>A tab-delimited line with short text identifiers for each column. These identifiers are used for referring to the column when processing the data programmatically, e.g. when writing a database query. <code>time</code> should always be the identifier for the first column. All columns must be filled in (<code>NA</code> is not allowed).</p>
+
+						<h2 id="toc_10">Data lines</h2>
+
+						<p>Following the header lines, the data lines must be tab-delimited and exactly match the columns defined in the header above.</p>
+
+						<p>As this file represents time series data, the first column should always be an ISO8601 timestamp, e.g. <code>2017-05-06T21:52:57.601Z</code>. It is strongly preferred that all times are
+						UTC, but if necessary a local timezone offset may be specified, e.g. <code>2017-05-06T21:52:57.601-0700</code>. This column may not contain <code>NA</code>.</p>
+
+						<p>Every column in every data line should be filled in. Remember to use the value <code>NA</code> for missing data.</p>
+
+						<p>Finally, data records should be listed in ascending chronological order.</p>
+
+						<h2 id="toc_11">FAQ</h2>
+
+						<h4 id="toc_12">Should I include coordinate data, e.g. latitude and longitude?</h5>
+
+						<p>This isn&#39;t necessary. Our system will read coordinate information from the ship&#39;s GPS navigation feed at a high time resolution. When plotting <strong>Y</strong> vs <strong>latitude</strong> the data in <strong>Y</strong> will be matched to latitude by timestamp. However, it&#39;s sometimes convenient to keep this data in the same file so feel free to include latitude and longitude columns as decimal degree <code>float</code> values.</p>
+
+						<h4 id="toc_13">Can I upload my data in multiple files representing different blocks of time?</h5>
+
+						<p>No. Each file upload should represent the entire set of the data for that file type and cruise. If you upload time points 1-10 in one file, then later upload time points 11-20 in another file, only points 11-20 will be findable in the system. The second upload should be a file with time points 1-20.</p>
+
+						<h4 id="toc_14">Is there a way to generate an ISO8601 timestamps in Excel?</h5>
+
+						<p>Excel doesn&#39;t have an ISO8601 time format available in the &quot;Format Cells&quot; interface, but it is possible to use a text formatting function to convert an Excel date to ISO8601. If <code>A1</code> has a cell that Excel recognizes as a date, render that date as UTC IS8601 with <code>=TEXT(A1,&quot;yyyy-mm-ddThh:MM:ssZ&quot;)</code>, or <code>=CONCATENATE(TEXT(A1,&quot;yyyy-mm-ddThh:MM:ss&quot;),&quot;-10:00&quot;)</code> to specify a timezone offset. In order to save a tab-delimited version of the file with the correct number of columns it may be necessary to perform this conversion, copy the ISO8601 column data, do a &quot;paste special -&gt; values&quot; into the time column, then erase the cells with the formula.</p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<script src="scripts/jquery-3.2.1.min.js"></script>
+	<script src="scripts/bootstrap.min.js"></script>
+	<script src="scripts/upload.js"></script>
+</body>
+</html>
