@@ -126,7 +126,7 @@ app.post('/upload',
                 } catch (e) { } // something bad happened
                 if (! consulResult) {
                   console.log('Could not parse consul script output');
-                  res.end('Error, possibly invalid cruise name ' + parseResult.header.cruise);
+                  res.end('Error, possibly invalid cruise name ' + parseResult.header.cruise + '. Select either KOK1606 (Gradients 1) or MGL1704 (Gradients 2)');
                   return;
                 }
                 // Check header JSON returned from consul against header we parsed
