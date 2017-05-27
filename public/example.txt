@@ -1,5 +1,5 @@
 NiskinMacroNutrients
-MGL17-04
+MGL1704
 Concentration of macronutrients collected from niskins on station.
 NA	Station number	Depth of sampling in meters	"PO4 concentration, based on XY technique, in micromole per liter"	"NO3 concentration, based on YZ technique, in micromole per liter"
 time	category	float	float	float
