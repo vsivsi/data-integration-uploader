@@ -13,16 +13,14 @@ stdin.on('data', function (chunk) {
   inputJSON += chunk;
 });
 
-let parsedData;
+let parsedData = '';
 stdin.on('end', function () {
-  parsedData = JSON.parse(inputJSON);
+  try {
+    parsedData = JSON.parse(inputJSON);
+  } catch (e) { }
   // uncomment to simulate incompatible consul data
   //parsedData.headers[0] = 'notreal';
   console.error(parsedData.headers);
   const outputJSON = JSON.stringify(parsedData, null, '  ');
   stdout.write(outputJSON);
-  // Script should always exit with status 0 when key get/set
-  // is successful. Otherwise exit with error and client will
-  // see "Unknown Error"
-  process.exit(0);
 });
