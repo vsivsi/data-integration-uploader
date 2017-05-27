@@ -109,8 +109,9 @@ app.post('/upload',
             // CONSUL CHILD PROCESS
             // ********************
             // Send header prop as input to consul script
-            const consulChild = child.execFile(argv.consul,
-              [ parseResult.header.measurement ],
+            const consulChild = child.execFile(
+              argv.consul,
+              [ parseResult.header.measurement, parseResult.header.cruise ],
               (err, stdout, stderr) => {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
@@ -125,7 +126,7 @@ app.post('/upload',
                 } catch (e) { } // something bad happened
                 if (! consulResult) {
                   console.log('Could not parse consul script output');
-                  res.end('Unknown Error');
+                  res.end('Error, possibly invalid cruise name ' + parseResult.header.cruise);
                   return;
                 }
                 // Check header JSON returned from consul against header we parsed
@@ -136,19 +137,27 @@ app.post('/upload',
                   // ********************
                   // BACKUP CHILD PROCESS
                   // ********************
-                  child.execFile(argv.backup, [ path.resolve(req.file.path), parseResult.header.measurement ], (err, stdout, stderr) => {
-                    console.log('stdout: ' + stdout);
-                    console.log('stderr: ' + stderr);
-                    if (err) {
-                      console.log(err);
-                      res.end('Unknown Error');
-                      return;
-                    } else {
-                      console.log('restic backup successful');
-                      res.end('Success');
-                      return;
+                  child.execFile(
+                    argv.backup,
+                    [
+                      path.resolve(req.file.path),
+                      parseResult.header.measurement,
+                      parseResult.header.cruise
+                    ],
+                    (err, stdout, stderr) => {
+                      console.log('stdout: ' + stdout);
+                      console.log('stderr: ' + stderr);
+                      if (err) {
+                        console.log(err);
+                        res.end('Unknown Error');
+                        return;
+                      } else {
+                        console.log('restic backup successful');
+                        res.end('Success');
+                        return;
+                      }
                     }
-                  });  // END BACKUP
+                  );  // END BACKUP
                 } else {
                   // Validation failed at consul step
                   let errormsg = `Validation failed, ${parseResult.header.measurement} headers and/or types have changed\n`;
